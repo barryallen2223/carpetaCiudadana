@@ -1,0 +1,321 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/folder.css' %}">
+    <link rel="stylesheet" href="{% static 'css/structure.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modal.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+
+    <link rel="stylesheet" href="//cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="{% static 'js/folder.js' %}"></script>
+
+    <title>Dashboard GovCarpeta</title>
+</head>
+
+<body class="dark">
+    <!-- validateCitizen -->
+    {% if not loadFirstTime and FBState %}
+    <script>
+        alert('Operacion con exito!');
+    </script>
+    {% elif not loadFirstTime and not FBState %}
+    <script>
+        alert('Error en la operacion');
+    </script>
+    {% endif %}
+    <nav class="sidebar close">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="{% static 'images/icon.png' %}" alt="">
+                </span>
+
+                <div class="text logo-text">
+                    <span class="name">GovCarpeta</span>
+                    <span class="profession">
+                        {{ userOperatorName }}
+                        {% if userRegis %}
+                        <i style="font-size:16px; color: #49CC90;" class="fa-solid fa-circle-check"></i>
+                        {% elif not userRegis %}
+                        <i style="font-size:16px; color: #FD1819;" class="fa-solid fa-circle-xmark"></i>
+                        {% endif %}
+                    </span>
+
+                </div>
+            </div>
+
+            <i class='bx bx-chevron-right toggle'></i>
+        </header>
+
+        <div class="menu-bar">
+            <div class="menu">
+
+                <li class="search-box">
+                    <i class='bx bxs-file-find icon'></i>
+                    <input type="text" placeholder="Search...">
+                </li>
+
+                <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="#" class="dashboard">
+                            <i class='bx bxs-home icon'></i>
+                            <span class="text nav-text">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#" class="showFolder" href="{% url 'fileExplorer' %}">
+                            <i class='bx bxs-folder icon'></i>
+                            <span class="text nav-text">Mi carpeta</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#">
+                            <i class='bx bxs-bell icon'></i>
+                            <span class="text nav-text">Notificaciones</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#" class="addDoc">
+                            <i class='bx bxs-user-plus icon'></i>
+                            <span class="text nav-text">Registrar operador</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#" class="addOperator">
+
+                            <i class='bx bxs-file-plus icon'></i>
+                            <span class="text nav-text">Agregar documento</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#" class="verifyCitizen">
+                            <i class='bx bxs-cog icon'></i>
+                            <span class="text nav-text">Configuración</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="bottom-content">
+                <li class="">
+                    <a href="{% url 'logout' %}">
+                        <i class='bx bx-log-out icon'></i>
+                        <span class="text nav-text">Logout</span>
+                    </a>
+                </li>
+            </div>
+        </div>
+
+    </nav>
+
+    <section class="home">
+        <div class="text">Bienvenido de nuevo, {{ userName }}</div>
+        <div class="bodyInfo">
+            <button class="back">
+                <i class="mdi mdi-arrow-left"></i>
+            </button>
+            <div class="stage">
+                <div class="folder-wrap level-current scrolling">
+
+                    <div class="tile folder">
+                        <i class="mdi mdi-folder"></i>
+                        <h3>Mis documentos</h3>
+                        <p>-</p>
+                    </div>
+                </div>
+
+                <!-- Sub Level 1 -->
+                <div class="folder-wrap level-down">
+                    {% for item in documents %}
+                    <div class="tile form">
+                        <i class="mdi mdi-file-document"></i>
+                        <h3>{{ item.0 }}</h3>
+                        <p>{{ item.1 }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="RCM RCMHidden">
+        <form action="/registerCitizen/" method="POST">
+            {% csrf_token %}
+            <div class="flex">
+                <img src="{% static 'images/icon.png' %}" width="50px" height="50px" alt="user" />
+                <button class="RCMCloseBtn">⨉</button>
+            </div>
+            <div>
+                <h3>Registrarse ante un operador</h3>
+                <p>
+                    Llena los siguientes campos para completar la solicitud del registro
+                </p>
+            </div>
+            <input type="text" id="operatorId" name="operatorId" placeholder="ID del Operador" required />
+            <input type="text" id="operatorName" name="operatorName" placeholder="Nombre del Operador" required /><br>
+            <input type="submit" class="btn" value="Enviar">
+        </form>
+    </section>
+    <div class="RCMOverlay RCMHidden"></div>
+
+    <section class="ADM ADMHidden">
+        <form action="/authenticateDocument/" method="POST">
+            {% csrf_token %}
+            <div class="flex">
+                <img src="{% static 'images/icon.png' %}" width="50px" height="50px" alt="user" />
+                <button class="ADMCloseBtn">⨉</button>
+            </div>
+            <div>
+                <h3>Autenticar Documento</h3>
+                <p>
+                    Llena los siguientes campos para completar la solicitud del documento
+                </p>
+            </div>
+            <!-- <input type="text" id="id" name="id" placeholder="Cédula" required /> -->
+            <input type="text" id="url" name="url" placeholder="URL del documento" required />
+            <!-- <input type="text" id="title" name="title" placeholder="Título del documento" required /><br> -->
+            <input type="submit" class="btn" value="Enviar">
+        </form>
+    </section>
+    <div class="ADMOverlay ADMHidden"></div>
+
+    <section class="VCM VCMHidden">
+        <form action="/validateCitizen/" method="GET">
+            {% csrf_token %}
+            <div class="flex">
+                <img src="{% static 'images/icon.png' %}" width="50px" height="50px" alt="user" />
+                <button class="VCMCloseBtn">⨉</button>
+            </div>
+            <div>
+                <h3>Validar Ciudadano</h3>
+                <p>
+                    Llena los siguientes campos para completar la solicitud del documento
+                </p>
+            </div>
+            <input type="text" id="id" name="id" placeholder="Cédula" required /><br>
+            <input type="submit" class="btn" value="Enviar">
+        </form>
+    </section>
+    <div class="VCMOverlay VCMHidden"></div>
+
+    <script>
+        const body = document.querySelector('body'),
+            sidebar = body.querySelector('nav'),
+            toggle = body.querySelector(".toggle"),
+            searchBtn = body.querySelector(".search-box"),
+            modeText = body.querySelector(".mode-text");
+
+
+        toggle.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        })
+
+        searchBtn.addEventListener("click", () => {
+            sidebar.classList.remove("close");
+        })
+
+        const addDocument = document.querySelector(".addDoc");
+        const addOp = document.querySelector(".addOperator");
+        const verifyCitizen = document.querySelector(".verifyCitizen");
+        const folderBtn = document.querySelector('.showFolder');
+        const dash = document.querySelector('.dashboard');
+        /* 
+            RCM → registerCitizenModal
+            ADM → authenticateDocumentModal
+            VCM → validateCitizenModal
+        */
+        // ---------------RCM---------------
+        const RCM = document.querySelector(".RCM");
+        const RCMOverlay = document.querySelector(".RCMOverlay");
+        const RCMCloseBtn = document.querySelector(".RCMCloseBtn");
+
+        const RCMClose = function () {
+            RCM.classList.add("RCMHidden");
+            RCMOverlay.classList.add("RCMHidden");
+        };
+        RCMCloseBtn.addEventListener("click", RCMClose);
+        RCMOverlay.addEventListener("click", RCMClose);
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && !RCM.classList.contains("RCMHidden")) {
+                RCMClose();
+            }
+        });
+        const RCMOpen = function () {
+            RCM.classList.remove("RCMHidden");
+            RCMOverlay.classList.remove("RCMHidden");
+        };
+        addDocument.addEventListener("click", RCMOpen);
+
+        // ---------------ADM---------------
+        const ADM = document.querySelector(".ADM");
+        const ADMOverlay = document.querySelector(".ADMOverlay");
+        const ADMCloseBtn = document.querySelector(".ADMCloseBtn");
+
+        const ADMClose = function () {
+            ADM.classList.add("ADMHidden");
+            ADMOverlay.classList.add("ADMHidden");
+        };
+        ADMCloseBtn.addEventListener("click", ADMClose);
+        ADMOverlay.addEventListener("click", ADMClose);
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && !ADM.classList.contains("ADMHidden")) {
+                ADMClose();
+            }
+        });
+        const ADMOpen = function () {
+            ADM.classList.remove("ADMHidden");
+            ADMOverlay.classList.remove("ADMHidden");
+        };
+        addOp.addEventListener("click", ADMOpen);
+
+        // ---------------VCM---------------
+        const VCM = document.querySelector(".VCM");
+        const VCMOverlay = document.querySelector(".VCMOverlay");
+        const VCMCloseBtn = document.querySelector(".VCMCloseBtn");
+
+        const VCMClose = function () {
+            VCM.classList.add("VCMHidden");
+            VCMOverlay.classList.add("VCMHidden");
+        };
+        VCMCloseBtn.addEventListener("click", VCMClose);
+        VCMOverlay.addEventListener("click", VCMClose);
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && !VCM.classList.contains("VCMHidden")) {
+                VCMClose();
+            }
+        });
+        const VCMOpen = function () {
+            VCM.classList.remove("VCMHidden");
+            VCMOverlay.classList.remove("VCMHidden");
+        };
+        verifyCitizen.addEventListener("click", VCMOpen);
+
+        folderBtn.addEventListener("click", () => {
+            document.querySelector('.back').style.display = 'block';
+            document.querySelector('.stage').style.display = 'block';
+        });
+        dash.addEventListener("click", () => {
+            document.querySelector('.back').style.display = 'none';
+            document.querySelector('.stage').style.display = 'none';
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogIn</title>
+    <!-- <link rel="icon" type="image/x-icon" href="./assets/icon.ico"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <script>
+        function restrictInput(event) {
+            var input = event.target;
+            var value = input.value;
+            var newValue = value.replace(/[^0-9]/g, '');
+            if (newValue.length > 10) {
+                newValue = newValue.slice(0, 10);
+            }
+            input.value = newValue;
+        }
+        function validatePassword(event) {
+            var input = event.target;
+            var value = input.value;
+
+            // Check if password meets the requirements
+            var startsWithCapital = /^[A-Z]/.test(value);
+            var hasSpecialSymbol = /[*,!,-,_,?,$,^,&]/.test(value);
+            var withinLengthRange = value.length >= 8 && value.length <= 16;
+
+            if (startsWithCapital && hasSpecialSymbol && withinLengthRange) {
+                input.style.border = '3px solid green';
+            } else {
+                input.style.border = '3px solid red';
+            }
+        }
+
+        function showRequirements() {
+            var message = "Requisitos de seguridad: \n\t- Debe tener una longitud dentro del rango [8-16]\n\t- Debe empezar con una letra en mayúscula\n\t- Debe contener un símbolo especial *, !, -, _, ?, $, ^, &";
+            alert(message);
+        }
+    </script>
+</head>
+
+<body>
+    {% if invalid_credentials %}
+    <script>
+        alert('Incorrect credentials. Please try again.');
+    </script>
+    {% endif %}
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form action="/register/" method="POST">
+                {% csrf_token %}
+                <h1>Crear una cuenta</h1>
+                <input type="text" id="regisID" name="regisID" oninput="restrictInput(event)" placeholder="Cédula"
+                    required />
+                <input type="text" id="regisUsername" name="regisUsername" placeholder="Nombre" required />
+                <input type="text" id="regisVic" name="regisVic" placeholder="Dirección" required />
+                <input type="email" id="regisEmail" name="regisEmail" placeholder="Email" required />
+                <input type="password" id="regisPassword" name="regisPassword" oninput="validatePassword(event)"
+                    onclick="showRequirements()" placeholder="Contraseña" required />
+                <button id="regisBtn">Registrarse</button>
+            </form>
+        </div>
+        <div class="form-container sign-in-container">
+            <form action="/login/" method="POST">
+                {% csrf_token %}
+                <h1>Iniciar sesión</h1>
+                <div class="social-container">
+                </div>
+                <input type="email" id="logInEmail" name="logInEmail" value="{{ email }}" placeholder="Email"
+                    required />
+                <input type="password" id="logInPassword" name="logInPassword" placeholder="Contraseña" required />
+                <!-- <a href="#">¿Olvidaste tu contraseña?</a> -->
+                <button id="loginBtn" type="submit">Log In</button>
+            </form>
+        </div>
+
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>¡Bienvenido de nuevo a GovCarpeta!</h1>
+                    <p>Si ya estás registrado en el sistema, haz clic en LOG IN para iniciar sesión.</p>
+                    <button class="ghost" id="signIn">Log In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>¡Hola!</h1>
+                    <p>Si aún no tienes una cuenta, haz clic en el botón de abajo para registrarte.</p>
+                    <button class="ghost" id="signUp">Registrarse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/login.js' %}"></script>
+</body>
+
+</html>
